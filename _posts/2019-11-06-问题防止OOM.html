@@ -1,0 +1,13 @@
+---
+layout: default
+title: 问题(防止OOM)
+---
+<h2>{{ page.title }}</h2>
+<p>方法1：软引用</p
+<p>.          LruCache里存的是软引用对象，那么当内存不足的时候，Bitmap会被回收，也就是说通过SoftReference修饰的Bitmap就不会导致OOM
+</p>
+<p>方法2：onLowMemory</p>
+<P>.           当内存不足的时候，Activity、Fragment会调用onLowMemory方法，可以在这个方法里去清除缓存，Glide使用的就是这一种方式来防止OOM。
+</p>
+<p>方法3：从Bitmap 像素存储位置考虑</p>
+<p>.             Bitmap的像素数据大小 = 宽 * 高 * 1像素占用的内存。Android 8.0 之后Bitmap像素内存放在native堆?，Bitmap导致OOM的问题基本不会在8.0以上设备出现了（没有内存泄漏的情况下）,不放在java堆中</p>
