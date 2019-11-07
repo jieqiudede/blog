@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 问题(一)Parcelable 为什么效率高于 Serializable 
+title: 问题(1)Parcelable 为什么效率高于 Serializable 
 ---
 <h2>{{ page.title }}</h2>
 <p>Serializable是通过I/O读写存储在磁盘上的,使用反射机制，序列化过程较慢，且在序列化过程中创建许多临时对象，容易触发GC。Parcelable是直接在内存中读写的，自已实现封送和解封（marshalled &unmarshalled）操作，将一个完整的对象分解成Intent所支持的数据类型，不需要使用反射，所以Parcelable具有效率高，内存开销小的优点。
