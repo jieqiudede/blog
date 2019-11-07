@@ -1,7 +1,18 @@
 ---
 layout: default
-title: 问题(一)
+title: 问题(一)Parcelable 为什么效率高于 Serializable 
 ---
 <h2>{{ page.title }}</h2>
-<p>test</p>
-<p>test</p>
+<p>Serializable是通过I/O读写存储在磁盘上的,使用反射机制，序列化过程较慢，且在序列化过程中创建许多临时对象，容易触发GC。Parcelable是直接在内存中读写的，自已实现封送和解封（marshalled &unmarshalled）操作，将一个完整的对象分解成Intent所支持的数据类型，不需要使用反射，所以Parcelable具有效率高，内存开销小的优点。
+
+1. 效率
+
+         Serializable 内部序列化的时侯没有使用反射，但是反序列化中使用了反射，所以导致 Serializable 的效率比 Parcelable 低。
+        Parcelable 使用内存拷贝，效率比 Serializable 高。
+
+  2.损失
+1. Serializable 是 Java 平台通用的序列化接口，可用于磁盘存储就行持久化操作。
+2. Parcelable 是在Android SDK 中，受版本影响较大，且难以就行数据持久化。
+
+  3.关键
+     1.对象的属性都能进行序列化。</p>
