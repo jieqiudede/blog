@@ -3,11 +3,13 @@ layout: default
 title: 问题(一) (LruCache小结)( 磁盘缓存 DiskLruCache)
 ---
 <h2>{{ page.title }}</h2>
+<p>1.LruCache</p>
 <p>LruCache 采用最近最少使用算法，设定一个缓存大小，当缓存达到这个大小之后，会将最老的数据移除，避免图片占用内存过大导致OOM。</p>
 <p>LruCache 构造方法里创建一个LinkedHashMap，accessOrder 参数传true，表示按照访问顺序排序，数据存储基于LinkedHashMap。</p>
 <p>LinkHashMap 继承HashMap，在 HashMap的基础上，新增了双向链表结构，每次访问数据的时候，会更新被访问的数据的链表指针，具体就是先在链表中删除该节点，然后添加到链表头header之前，这样就保证了链表头header节点之前的数据都是最近访问的（从链表中删除并不是真的删除数据，只是移动链表指针，数据本身在map中的位置是不变的）。
 </p><p>LruCache 内部用LinkHashMap存取数据，在双向链表保证数据新旧顺序的前提下，设置一个最大内存，往里面put数据的时候，当数据达到最大内存的时候，将最老的数据移除掉，保证内存不超过设定的最大值。</p>
 
+<p>2.DiskLruCache</p>
 <p>DiskLruCache 跟 LruCache 实现思路是差不多的，一样是设置一个总大小，每次往硬盘写文件，总大小超过阈值，就会将旧的文件删除。
 </p><p>DiskLruCache 同样是利用LinkHashMap的特点，只不过数组里面存的 Entry 有点变化，Editor 用于操作文件。
 </p>
