@@ -7,20 +7,17 @@ title: Looper,ThreadLocal,ThreadLocalMap,MessageQueue
 * static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();  
 
 '''  
-
 private static void prepare(boolean quitAllowed) {
      if (sThreadLocal.get() != null) {
         throw new RuntimeException("Only one Looper may be created per thread");
      }
      sThreadLocal.set(new Looper(quitAllowed));
      }  
-
 '''  
 * final Thread mThread;  
 * final MessageQueue mQueue;  
 
 '''  
-
 private Looper(boolean quitAllowed) {
      mQueue = new MessageQueue(quitAllowed);
      mThread = Thread.currentThread();
