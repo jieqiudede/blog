@@ -99,3 +99,9 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 ```
 # MessageQueue  
 
+
+# 总结
+* 当一个Thread().start()后，就执行传进来的run方法，当然这个Thread是传到native层创建然后调用的run方法，然后在调用外部传进来的runnable。  
+  这时如果我们想求让这个Thread loop就要在这个runnable的run中调用looper.prepare(),这里是为了创建一个Looper,并且在这个looper里绑定thread，所以在这里looper是持有thread的。  
+  由于looper有个静态变量sThreadLocal（ThreadLocal<Looper>），这个ThreadLocal被当作key，looper当作value存在ThreadLocalMap，ThreadLocalMap是Thread的一个变量threadLocals,ThreadLocalMap内部又个Entry[] table，这个Entry会弱引用ThreadLocal，但不会弱引用value（looper）ThreadLocal是以int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);的角标存在table中的table[i] = new Entry(firstKey, firstValue);  
+
