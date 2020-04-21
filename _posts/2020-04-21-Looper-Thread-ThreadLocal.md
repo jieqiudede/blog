@@ -5,25 +5,31 @@ title: Looper,ThreadLocal,ThreadLocalMap,MessageQueue
 
 # Looper  
 * static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();  
-'''
+'''  
+
 private static void prepare(boolean quitAllowed) {
      if (sThreadLocal.get() != null) {
         throw new RuntimeException("Only one Looper may be created per thread");
      }
      sThreadLocal.set(new Looper(quitAllowed));
      }  
+
 '''  
 * final Thread mThread;  
 * final MessageQueue mQueue;  
-'''
+
+'''  
+
 private Looper(boolean quitAllowed) {
      mQueue = new MessageQueue(quitAllowed);
      mThread = Thread.currentThread();
     }  
+
 '''  
 
 # ThreadLocal  
-'''
+'''  
+
  public void set(T value) {
         Thread t = Thread.currentThread();
         ThreadLocalMap map = getMap(t);
@@ -43,7 +49,8 @@ void createMap(Thread t, T firstValue) {
 
 '''
 # ThreadLocalMap  
-'''
+'''  
+
 private void set(ThreadLocal<?> key, Object value) {
 
             // We don't use a fast path as with get() because it is at
