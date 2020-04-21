@@ -57,7 +57,7 @@ public static void loop() {
 * 主要是当key使用 在ThreadLocalMap中存值，比如存Looper  
 
 ```
- public void set(T value) {
+public void set(T value) {
         Thread t = Thread.currentThread();
         ThreadLocalMap map = getMap(t);
         if (map != null)
@@ -73,6 +73,7 @@ public static void loop() {
 void createMap(Thread t, T firstValue) {
         t.threadLocals = new ThreadLocalMap(this, firstValue);
     }  
+
 ```
 
 # ThreadLocalMap  
