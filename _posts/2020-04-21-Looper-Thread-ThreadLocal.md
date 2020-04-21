@@ -40,7 +40,7 @@ public static void loop() {
             }
             //......
             try {
-                msg.target.dispatchMessage(msg);
+                msg.target.dispatchMessage(msg);  //这里target是赋值的hander
                 //......
             } finally {
                //......
@@ -125,8 +125,27 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
         }  
 ```
 # MessageQueue  
-* 内部有一个enqueueMessage(Message msg, long when),这里是用单项链表存储的Message,根据when排序，优先比较队列中排在最后的那个Message,when值晓得派在最后，也就是先出。如果不满足 就会while循环队列查找when大的然后插入  
+* 内部有一个enqueueMessage(Message msg, long when),这里是用单项链表存储的Message,根据when排序，优先比较队列中排在最后的那个Message,when值晓得派在最后，也就是先出。如果不满足 就会while循环队列查找when大的然后插入(这里不能说是队列，是一个单项链表，只是操作类似队列，按照“先进先出”的原则存放消息。存放并非实际意义的保存，而是将Message对象以链表的方式串联起来的)  
 
+# Message  
+* 当我们每次需要创建Message的时候，从缓存池中获取，如果缓存池没有，再创建。消息使用完了会放回缓存池中,从代码来只有第一次的会创建，然后，把用过的message放回缓存池中  
+
+* 消息缓存池的逻辑  
+```
+ public static Message obtain() {
+        synchronized (sPoolSync) {
+            if (sPool != null) {
+                Message m = sPool;
+                sPool = m.next;
+                m.next = null;
+                m.flags = 0; // clear in-use flag
+                sPoolSize--;
+                return m;
+            }
+        }
+        return new Message();
+    }  
+```
 # Hander  
 ```
 public Handler(Looper looper, Callback callback, boolean async) {
@@ -179,7 +198,9 @@ private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMilli
     }
 
 ```  
-Handler将Message发送到Looper的消息队列中，即MessageQueue，等待Looper的循环读取Message，处理Message，然后调用Message的target，即附属的Handler的dispatchMessage（）方法，将该消息回调到handleMessage（）方法中，然后完成更新UI操作。
+* 如何实现延迟的呢  
+  利用的还是epoll机制,epoll_wait这个系统调用，有一个参数是timeout，表示epoll_wait()将要阻塞的毫秒数
+* Handler将Message发送到Looper的消息队列中，即MessageQueue，等待Looper的循环读取Message，处理Message，然后调用Message的target，即附属的Handler的dispatchMessage（）方法，将该消息回调到handleMessage（）方法中，然后完成更新UI操作。
 
 # 总结
 * 当一个Thread().start()后，就执行传进来的run方法，当然这个Thread是传到native层创建然后调用的run方法，然后在调用外部传进来的runnable。  
