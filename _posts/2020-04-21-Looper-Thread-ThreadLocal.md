@@ -21,7 +21,34 @@ private static void prepare(boolean quitAllowed) {
 private Looper(boolean quitAllowed) {
      mQueue = new MessageQueue(quitAllowed);
      mThread = Thread.currentThread();
-    }  
+    }
+  
+public static void loop() {
+        final Looper me = myLooper();   //获得当前的Looper
+        if (me == null) {
+            throw new RuntimeException("No Looper; Looper.prepare() wasn't called on this thread.");
+        }
+        
+        final MessageQueue queue = me.mQueue;  //获取当前Looper的消息队列
+        //......
+
+        for (;;) {
+            Message msg = queue.next();  //取出队头的消息
+            if (msg == null) {
+                // 如果消息为空
+                return;
+            }
+            //......
+            try {
+                msg.target.dispatchMessage(msg);
+                //......
+            } finally {
+               //......
+            }
+           //......
+            msg.recycleUnchecked();  //回收可能正在使用的消息
+        }
+    }
 
 ```  
 
@@ -98,7 +125,61 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
         }  
 ```
 # MessageQueue  
+* 内部有一个enqueueMessage(Message msg, long when),这里是用单项链表存储的Message,根据when排序，优先比较队列中排在最后的那个Message,when值晓得派在最后，也就是先出。如果不满足 就会while循环队列查找when大的然后插入  
 
+# Hander  
+```
+public Handler(Looper looper, Callback callback, boolean async) {
+        mLooper = looper;				
+        mQueue = looper.mQueue;
+        mCallback = callback;
+        mAsynchronous = async;
+    }
+public static Message obtain(Handler h, Runnable callback) {
+        Message m = obtain();
+        m.target = h;
+        m.callback = callback;
+        return m;
+    }  
+
+```  
+* 当我们调用Handler进行发送消息时，最终都会调用sendMessageAtTime（）方法，最后调用enqueueMessage( ) 发送到消息队列。  
+
+```  
+public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
+        MessageQueue queue = mQueue;  //获得当前的消息队列
+        if (queue == null) {   //若是在创建Handler时没有指定Looper，就不会有对应的消息队列queue ，自然就会为null
+            RuntimeException e = new RuntimeException(
+                    this + " sendMessageAtTime() called with no mQueue");
+            Log.w("Looper", e.getMessage(), e);
+            return false;
+        }
+        return enqueueMessage(queue, msg, uptimeMillis); 
+    }
+
+private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) {
+        msg.target = this;   //这个target就是前面我们说到过的
+        if (mAsynchronous) {
+            msg.setAsynchronous(true);
+        }
+        return queue.enqueueMessage(msg, uptimeMillis);
+    }  
+
+ public void dispatchMessage(Message msg) {
+        if (msg.callback != null) {
+            handleCallback(msg);
+        } else {
+            if (mCallback != null) {
+                if (mCallback.handleMessage(msg)) {
+                    return;
+                }
+            }
+            handleMessage(msg);
+        }
+    }
+
+```  
+Handler将Message发送到Looper的消息队列中，即MessageQueue，等待Looper的循环读取Message，处理Message，然后调用Message的target，即附属的Handler的dispatchMessage（）方法，将该消息回调到handleMessage（）方法中，然后完成更新UI操作。
 
 # 总结
 * 当一个Thread().start()后，就执行传进来的run方法，当然这个Thread是传到native层创建然后调用的run方法，然后在调用外部传进来的runnable。  
