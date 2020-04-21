@@ -54,7 +54,8 @@ public static void loop() {
 ```  
 
 # ThreadLocal  
-* 只要是当key使用 在ThreadLocalMap中存值，比如存Looper
+* 主要是当key使用 在ThreadLocalMap中存值，比如存Looper  
+
 ```
  public void set(T value) {
         Thread t = Thread.currentThread();
@@ -73,6 +74,7 @@ void createMap(Thread t, T firstValue) {
         t.threadLocals = new ThreadLocalMap(this, firstValue);
     }  
 ```
+
 # ThreadLocalMap  
 * 用ThreadLocal生成key 来存值，是Thread的子成员
 ```
