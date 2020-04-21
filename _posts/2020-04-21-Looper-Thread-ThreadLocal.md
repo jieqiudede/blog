@@ -5,6 +5,7 @@ title: Looper,ThreadLocal,ThreadLocalMap,MessageQueue
 
 # Looper  
 * static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();  
+
 '''  
 
 private static void prepare(boolean quitAllowed) {
