@@ -146,7 +146,8 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
         return new Message();
     }  
 ```
-# Hander  
+
+# Hander
 ```
 public Handler(Looper looper, Callback callback, boolean async) {
         mLooper = looper;				
